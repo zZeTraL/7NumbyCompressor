@@ -1,0 +1,32 @@
+---
+title: "Usage"
+output: html_notebook
+---
+
+### Reading data from the compression report
+The main purpose of this program is to provide (for me) a simple way to compress large bunch of folders which contain a lot of files.
+The compression report is a csv file which contains the following columns:
+
+- `name`: the name of the file
+- `input_path`: path of the original file
+- `output_path`: path of the compressed file
+- `original_size`: the original size of the file
+- `compressed_size`: the compressed size of the file
+- `saved_storage`: the saved storage we got from the compression
+- `percent`: the percentage of the saved storage
+
+```{r}
+data <- read.csv("./example/compression_report_2024-02-01_02-06-06.csv")
+data
+```
+
+Each file that has been compressed will be logged into a log file. The log file is a csv file which contains the following columns:
+
+- `path`: the path of the original file
+- `is_compressed`: a boolean value which indicates if the file has been compressed or not
+- `compression_level`: the compression level represents the quality of the compression. The higher the compression level, the better the compression quality. The compression level is an integer between 0 and 9.
+
+```{r}
+data <- read.csv("./example/log.csv")
+data
+```

@@ -1,0 +1,10 @@
+input_path,name,original_size,compressed_size,saved_storage,percent,output_path
+input/1111.png,1111.png,272.39 KB,272.39 KB,0 B,0,
+input/1105.png,1105.png,3.08 MB,2.64 MB,449.98 KB,14.27%,output/1105.png
+input/1204.png,1204.png,3.15 MB,2.9 MB,259.75 KB,8.05%,output/1204.png
+input/1001.png,1001.png,3.61 MB,3.21 MB,405.73 KB,10.97%,output/1001.png
+input/1104.png,1104.png,3.29 MB,2.82 MB,472.24 KB,14.04%,output/1104.png
+input/1002.png,1002.png,3.36 MB,3.0 MB,370.06 KB,10.76%,output/1002.png
+input/1205.png,1205.png,3.82 MB,3.69 MB,136.07 KB,3.47%,output/1205.png
+input/1217.png,1217.png,2.88 MB,2.76 MB,124.47 KB,4.22%,output/1217.png
+input/1302.png,1302.png,2.65 MB,2.52 MB,132.81 KB,4.9%,output/1302.png

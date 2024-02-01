@@ -1,0 +1,10 @@
+path,is_compressed,compression_level
+input/1111.png,False,70
+input/1105.png,True,70
+input/1204.png,True,70
+input/1001.png,True,70
+input/1104.png,True,70
+input/1002.png,True,70
+input/1205.png,True,70
+input/1217.png,True,70
+input/1302.png,True,70

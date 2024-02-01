@@ -80,7 +80,7 @@ def main(input_folder, output_folder, compression_level, overwrite):
         batch_id = batches.index(batch) + 1
         process_batch(batch_id, batch, output_folder, compression_level, overwrite)
 
-    print(f"[INFO] Compression finished")
+    print(f"[INFO] Operation completed")
     print(f"[INFO] Files compressed: {len(df)}")
     print(f"[INFO] Files not compressed: {len(files_to_compress) - len(df)}")
     save_log(log)
@@ -91,4 +91,4 @@ def main(input_folder, output_folder, compression_level, overwrite):
 input_directory = "D:/WebstormProjects/7Numby/client/public/StarRailRes/image/character_preview"
 log = load_log()
 df = create_compress_report()
-main(input_directory, "output", 70, True)
+main("input", "output", 70, False)
