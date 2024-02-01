@@ -1,14 +1,14 @@
-from concurrent.futures import ThreadPoolExecutor
-
 import pandas as pd
 import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
+from tqdm import tqdm
 from functions.utils import *
 from functions.log import *
 
 # Constants
 THREAD_NUMBER = 4
-BATCH_SIZE = 10
+BATCH_SIZE = 12
 
 
 def compress_file(input_path, output_path, compression_level):
@@ -17,6 +17,7 @@ def compress_file(input_path, output_path, compression_level):
 
     # We open the image and save it with the compression level to the output folder
     image = Image.open(input_path)
+
     image.save(output_path, optimize=True, quality=compression_level)
 
     # We compute the original size, the compressed size, the saved storage and the percent
@@ -29,13 +30,13 @@ def compress_file(input_path, output_path, compression_level):
     # If compressed size is greater than original size, we delete the compressed file
     if compressed_size > original_size:
         os.remove(output_path)
-        print(f"[INFO] {file_name} was not compressed because the compressed size is greater than the original size")
+        # print(f"[INFO] {file_name} was not compressed because the compressed size is greater than the original size")
         return input_path, file_name, original_size, original_size, 0, 0, None, False
 
     return input_path, file_name, original_size, compressed_size, saved_storage, percent, output_path, is_compressed
 
 
-def process_batch(batch, output_folder, compression_level):
+def process_batch(id, batch, output_folder, compression_level):
     with concurrent.futures.ThreadPoolExecutor(max_workers=THREAD_NUMBER) as executor:
         futures = []
         for file in batch:
@@ -43,17 +44,19 @@ def process_batch(batch, output_folder, compression_level):
             future = executor.submit(compress_file, file, output_path, compression_level)
             futures.append(future)
 
-        for future in concurrent.futures.as_completed(futures):
-            input_path, name, original_size, compressed_size, saved_storage, percent, output_path, is_compressed = future.result()
-            df.loc[len(df)] = [input_path, name,
-                               convert_size(original_size),
-                               convert_size(compressed_size),
-                               convert_size(saved_storage),
-                               percent,
-                               output_path]
-            log.loc[len(log)] = [input_path, is_compressed, compression_level]
+        with tqdm(total=len(futures), desc=f"Processing ({id})", unit="files", leave=True) as pbar:
+            for future in concurrent.futures.as_completed(futures):
+                input_path, name, original_size, compressed_size, saved_storage, percent, output_path, is_compressed = future.result()
+                df.loc[len(df)] = [input_path, name,
+                                   convert_size(original_size),
+                                   convert_size(compressed_size),
+                                   convert_size(saved_storage),
+                                   percent,
+                                   output_path]
+                log.loc[len(log)] = [input_path, is_compressed, compression_level]
+                pbar.update(1)
 
-    print(f"[INFO] Batch of {len(batch)} files compressed")
+    print(f"\n[INFO] Batch of {len(batch)} files compressed")
 
 
 def main(input_folder, output_folder, compression_level, overwrite):
@@ -71,8 +74,13 @@ def main(input_folder, output_folder, compression_level, overwrite):
     for i in range(0, len(files_to_compress), BATCH_SIZE):
         batches.append(files_to_compress[i:i + BATCH_SIZE])
 
+    if overwrite:
+        output_folder = input_folder
+        print(f"[INFO] Overwriting files in {output_folder}")
+
     for batch in batches:
-        process_batch(batch, output_folder, compression_level)
+        id = batch[0].split("/")[-1].split(".")[0]
+        process_batch(id, batch, output_folder, compression_level)
 
     print(f"[INFO] Compression finished")
     print(f"[INFO] Files compressed: {len(df)}")
@@ -85,6 +93,6 @@ def main(input_folder, output_folder, compression_level, overwrite):
 input_directory = "D:/WebstormProjects/7Numby/client/public/StarRailRes/image/character_preview"
 log = load_log()
 df = create_compress_report()
-main("input", "output", 70, False)
+main(input_directory, "output", 70, False)
 
 # %%
