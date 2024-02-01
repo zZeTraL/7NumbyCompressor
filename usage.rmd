@@ -16,17 +16,17 @@ The compression report is a csv file which contains the following columns:
 - `percent`: the percentage of the saved storage
 
 ```{r}
-data <- read.csv("./example/compression_report_2024-02-01_02-06-06.csv")
+data <- read.csv("./example/compression_report_2024-02-01_02-47-12.csv")
 data
 ```
 
-Each file that has been compressed will be logged into a log file. The log file is a csv file which contains the following columns:
+Each file that has been compressed will be logged into a history file. This history file is a csv file which contains the following columns:
 
 - `path`: the path of the original file
 - `is_compressed`: a boolean value which indicates if the file has been compressed or not
 - `compression_level`: the compression level represents the quality of the compression. The higher the compression level, the better the compression quality. The compression level is an integer between 0 and 9.
 
 ```{r}
-data <- read.csv("./example/log.csv")
+data <- read.csv("./example/history.csv")
 data
 ```

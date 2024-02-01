@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
 from tqdm import tqdm
 from functions.utils import *
-from functions.log import *
+from functions.logger import *
 
 # Constants
 THREAD_NUMBER = 6
@@ -57,7 +57,7 @@ def process_batch(batch_id, batch, output_folder, compression_level, overwrite):
                                    convert_size(saved_storage),
                                    percent,
                                    output_path]
-                log.loc[len(log)] = [input_path, is_compressed, compression_level]
+                history.loc[len(history)] = [input_path, is_compressed, compression_level]
                 pbar.update(1)
 
 
@@ -66,7 +66,7 @@ def main(input_folder, output_folder, compression_level, overwrite):
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
     # We retrieve the files to compress
-    files_to_compress = get_files_to_compress(input_folder, log)
+    files_to_compress = get_files_to_compress(input_folder, history)
     if len(files_to_compress) == 0:
         print(f"[INFO] Operation done : No files to compress")
         return
@@ -80,15 +80,31 @@ def main(input_folder, output_folder, compression_level, overwrite):
         batch_id = batches.index(batch) + 1
         process_batch(batch_id, batch, output_folder, compression_level, overwrite)
 
-    print(f"[INFO] Operation completed")
-    print(f"[INFO] Files compressed: {len(df)}")
-    print(f"[INFO] Files not compressed: {len(files_to_compress) - len(df)}")
-    save_log(log)
+    original_folder_size = convert_size(get_folder_size(input_folder))
+    compressed_folder_size = convert_size(get_folder_size(output_folder))
+    print("[INFO] Operation completed")
+    print(f"[INFO] Original folder size: {original_folder_size}")
+    print(f"[INFO] Compressed folder size: {compressed_folder_size}")
+    print("[INFO] More details in the log file")
+
+    # write in log the date and time of the operation and the number of files compressed
+    log_write(
+        "-----" * 32 +
+        f"\n[{pd.Timestamp.now().strftime('%Y-%m-%d_%H-%M-%S')}]\n"
+        f'\tinput_path: {input_folder}\n'
+        f'\toutput_path: {output_folder}\n'
+        f"\tOriginal folder size: {original_folder_size}\n "
+        f"\tCompressed folder size: {compressed_folder_size}\n "
+        f"\tFiles compressed: {len(df)}\n "
+        f"\tFiles not compressed: {len(files_to_compress) - len(df)}\n "
+        f'\tCompression level: {compression_level}\n'
+    )
+    save_history(history)
     save_compress_report(df)
 
 
 # Main
 input_directory = "D:/WebstormProjects/7Numby/client/public/StarRailRes/image/character_preview"
-log = load_log()
+history = load_history()
 df = create_compress_report()
 main("input", "output", 70, False)

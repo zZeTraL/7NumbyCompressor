@@ -1,0 +1,9 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+[2024-02-01_02-47-12]
+	input_path: input
+	output_path: output
+	Original folder size: 26.1 MB
+ 	Compressed folder size: 23.54 MB
+ 	Files compressed: 9
+ 	Files not compressed: 0
+ 	Compression level: 70

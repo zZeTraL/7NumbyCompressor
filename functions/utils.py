@@ -23,7 +23,7 @@ def get_files(input_folder):
     return files_name, files_path
 
 
-def get_files_to_compress(input_folder, log):
+def get_files_to_compress(input_folder, history):
     files_name, files_path = get_files(input_folder)
     files_to_compress = []
     files_already_compressed = []
@@ -32,18 +32,26 @@ def get_files_to_compress(input_folder, log):
 
     for path in files_path:
         # Check if the file is already compressed
-        if path in log["path"].values:
+        if path in history["path"].values:
             files_already_compressed.append(path)
         else:
             files_to_compress.append(path)
 
     print(f"[INFO] Files already compressed: {len(files_path) - len(files_to_compress)}")
     # DEBUG
-    #for path in files_already_compressed:
-        #print(f"{os.path.basename(path)}")
+    # for path in files_already_compressed:
+    # print(f"{os.path.basename(path)}")
     print(f"[INFO] Files to compress: {len(files_to_compress)}")
     # DEBUG
-    #for path in files_to_compress:
-        #print(f"{os.path.basename(path)}")
+    # for path in files_to_compress:
+    # print(f"{os.path.basename(path)}")
     return files_to_compress
 
+
+def get_folder_size(folder_path):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(folder_path):
+        for filename in filenames:
+            file_path = os.path.join(dirpath, filename)
+            total_size += os.path.getsize(file_path)
+    return total_size
