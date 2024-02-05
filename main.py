@@ -37,7 +37,7 @@ def compress_file(input_path, output_path, compression_level, overwrite):
     if overwrite:
         shutil.move(output_path, input_path)
 
-    return input_path, file_name, original_size, compressed_size, saved_storage, percent, output_path, is_compressed
+    return input_path, file_name, original_size, compressed_size, saved_storage, percent, output_path if not overwrite else input_path, is_compressed
 
 
 def process_batch(batch_id, batch, output_folder, compression_level, overwrite):
@@ -62,6 +62,7 @@ def process_batch(batch_id, batch, output_folder, compression_level, overwrite):
 
 
 def main(input_folder, output_folder, compression_level, overwrite):
+    original_folder_size = convert_size(get_folder_size(input_folder))
     # Check if the output folder exists and overwrite is False
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
@@ -75,13 +76,13 @@ def main(input_folder, output_folder, compression_level, overwrite):
     batches = []
     for i in range(0, len(files_to_compress), BATCH_SIZE):
         batches.append(files_to_compress[i:i + BATCH_SIZE])
+        print(f"[INFO] Batch {len(batches)} created with {len(batches[-1])} files")
 
     for batch in batches:
         batch_id = batches.index(batch) + 1
         process_batch(batch_id, batch, output_folder, compression_level, overwrite)
 
-    original_folder_size = convert_size(get_folder_size(input_folder))
-    compressed_folder_size = convert_size(get_folder_size(output_folder))
+    compressed_folder_size = convert_size(get_folder_size(output_folder)) if not overwrite else convert_size(get_folder_size(input_folder))
     print("[INFO] Operation completed")
     print(f"[INFO] Original folder size: {original_folder_size}")
     print(f"[INFO] Compressed folder size: {compressed_folder_size}")
@@ -93,6 +94,7 @@ def main(input_folder, output_folder, compression_level, overwrite):
         f"\n[{pd.Timestamp.now().strftime('%Y-%m-%d_%H-%M-%S')}]\n"
         f'\tinput_path: {input_folder}\n'
         f'\toutput_path: {output_folder}\n'
+        f'\tOverwrite: {overwrite}\n'
         f"\tOriginal folder size: {original_folder_size}\n "
         f"\tCompressed folder size: {compressed_folder_size}\n "
         f"\tFiles compressed: {len(df)}\n "
@@ -104,7 +106,34 @@ def main(input_folder, output_folder, compression_level, overwrite):
 
 
 # Main
-input_directory = "D:/WebstormProjects/7Numby/client/public/StarRailRes/image/character_preview"
+input_directory = "D:/WebstormProjects/StarRailRes_fork/icon/avatar"
 history = load_history()
 df = create_compress_report()
-main("input", "output", 70, False)
+
+directories = [
+    "D:/WebstormProjects/StarRailRes_fork/image/character_portrait",
+    "D:/WebstormProjects/StarRailRes_fork/image/character_preview",
+    "D:/WebstormProjects/StarRailRes_fork/image/light_cone_portrait",
+    "D:/WebstormProjects/StarRailRes_fork/image/light_cone_preview",
+    "D:/WebstormProjects/StarRailRes_fork/image/simulated_event",
+
+    "D:/WebstormProjects/StarRailRes_fork/icon/avatar",
+    "D:/WebstormProjects/StarRailRes_fork/icon/block",
+    "D:/WebstormProjects/StarRailRes_fork/icon/character",
+    "D:/WebstormProjects/StarRailRes_fork/icon/curio",
+    "D:/WebstormProjects/StarRailRes_fork/icon/deco",
+    "D:/WebstormProjects/StarRailRes_fork/icon/element",
+    "D:/WebstormProjects/StarRailRes_fork/icon/item",
+    "D:/WebstormProjects/StarRailRes_fork/icon/light_cone",
+    "D:/WebstormProjects/StarRailRes_fork/icon/logo",
+    "D:/WebstormProjects/StarRailRes_fork/icon/path",
+    "D:/WebstormProjects/StarRailRes_fork/icon/property",
+    "D:/WebstormProjects/StarRailRes_fork/icon/relic",
+    "D:/WebstormProjects/StarRailRes_fork/icon/sign",
+    "D:/WebstormProjects/StarRailRes_fork/icon/skill",
+]
+
+# process each path in the array
+for directory in directories:
+    print(f"[INFO] Processing {directory}")
+    main(directory, "output", 80, True)
